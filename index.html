@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お試し版 ○×でわかる中医学入門</title>
+    <style>
+        :root { --main-color: #2c3e50; --accent-color: #27ae60; --error-color: #e74c3c; --bg-color: #f4f7f6; }
+        
+        body { 
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--main-color); 
+            margin: 0; 
+            padding: 40px 20px 20px;
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .top-thumbnail {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            margin-bottom: 30px; 
+            border-radius: 8px;  
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        }
+
+        .container { background: white; max-width: 600px; width: 100%; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
+        .hidden { display: none !important; }
+        h1 { font-size: 1.4rem; margin-bottom: 20px; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; color: var(--main-color); }
+        button { background-color: var(--accent-color); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1rem; margin: 10px 5px; transition: 0.3s; min-width: 120px; }
+        button:hover { opacity: 0.8; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        
+        .btn-link { 
+            display: inline-block; 
+            background-color: #e67e22; 
+            color: white; 
+            text-decoration: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            margin: 10px 0; 
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 1rem;
+        }
+
+        .ox-container { display: flex; justify-content: center; gap: 30px; margin: 25px 0; }
+        .btn-o { background-color: #3498db; font-size: 1.8rem; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; min-width: 70px; }
+        .btn-x { background-color: #e67e22; font-size: 1.8rem; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; min-width: 70px; }
+        
+        #feedback { font-weight: bold; font-size: 1.5rem; margin: 15px 0; min-height: 1.6em; }
+        #explanation-box { background: #e8f6ef; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: left; border-left: 5px solid var(--accent-color); font-size: 0.95rem; line-height: 1.6; }
+        .range-label { display: block; margin-top: 25px; font-weight: bold; }
+        
+        select {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0 25px 0; /* 下部のマージンを調整 */
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            color: var(--main-color);
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        #quiz-header { font-size: 0.85rem; color: #888; margin-bottom: 5px; text-align: right; }
+        
+        #category-tag { display: inline-block; background: var(--accent-color); color: white; padding: 5px 15px; border-radius: 20px; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .analytics-note { font-size: 0.75rem; color: #95a5a6; margin-top: 25px; line-height: 1.4; text-align: center; }
+
+        /* キャラクターと吹き出しの構造 */
+        #char-animation-container {
+            height: 200px;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            margin: 20px auto;
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        #char-sprite {
+            height: 150px;
+            width: auto;
+            z-index: 5;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            top: 0;
+            left: 60%;
+            background: #fff;
+            border: 3px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 10;
+            min-width: 100px;
+        }
+
+        .speech-bubble::after {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 10px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 15px 15px 0 0;
+            border-color: var(--accent-color) transparent transparent transparent;
+        }
+
+        .speech-bubble::before {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 13px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 12px 12px 0 0;
+            border-color: #fff transparent transparent transparent;
+            z-index: 11;
+        }
+
+        .bubble-text {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+            white-space: nowrap;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<img src="wakaru_chuui.jpg" alt="注意" class="top-thumbnail">
+
+<div class="container">
+    <div id="view-setup">
+        <h1>お試し版 〇×で学ぶ<br>「わかる中医学入門」</h1>
+        <h2 style="font-size: 1.2rem; color: #555; margin-top: -10px; margin-bottom: 20px;">日本中医鍼灸研究会</h2>
+        <p>サンプル問題の中から3問ランダムに出題されます。</p>
+        
+        <label class="range-label">出題カテゴリを選択してください。</label>
+        <select id="category-select">
+            <option value="all">すべて</option>
+        </select>
+        
+        <br>
+        <button onclick="startQuiz()">学習を開始する</button>
+
+        <p class="analytics-note">
+            ※当サイトでは利用状況把握のためGoogle アナリティクスを使用しています。データは匿名で収集されており、個人を特定するものではありません。
+        </p>
+    </div>
+
+    <div id="view-quiz" class="hidden">
+        <div id="quiz-header"></div>
+        <div id="category-tag"></div>
+        <div id="question-text" style="font-size: 1.25rem; margin: 10px 0 25px 0; min-height: 100px; font-weight: 500; line-height: 1.5;"></div>
+        
+        <div class="ox-container">
+            <button id="btn-choice-o" class="btn-o" onclick="judge('〇')">〇</button>
+            <button id="btn-choice-x" class="btn-x" onclick="judge('×')">×</button>
+        </div>
+        
+        <div id="feedback"></div>
+        
+        <div style="margin-top: 20px;">
+            <button id="btn-explanation" class="hidden" style="background-color: #7f8c8d;" onclick="toggleExplanation()">解説を見る</button>
+            <button id="btn-next" class="hidden" onclick="nextQuestion()">次の問題へ</button>
+        </div>
+        <div id="explanation-box" class="hidden"></div>
+    </div>
+
+    <div id="view-result" class="hidden">
+        <h1>学習終了</h1>
+        <div id="char-animation-container">
+            <div id="speech-bubble" class="speech-bubble">
+                <span class="bubble-text">やったね！</span>
+            </div>
+            <img id="char-sprite" src="syoumen.jpg" alt="character">
+        </div>
+        <div id="score-display" style="font-size: 1.8rem; margin: 20px 0; line-height: 1.4;"></div>
+        
+        <button onclick="showView('view-setup')">最初からやり直す</button>
+        <br>
+        <button style="background-color: #95a5a6; margin-top: 10px;" onclick="location.reload()">ページを更新する</button>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0 20px 0;">
+        <p style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">さらなる学習には公式テキストがおすすめです</p>
+        <a href="https://xn--z8j3ah2b4856byrk.com/?pid=188521497" target="_blank" class="btn-link">公式テキストを購入する</a>
+    </div>
+</div>
+
+<script>
+    let allQuestions = [];
+    let targetQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    const animImages = ["syoumen.jpg", "migi90do.jpg", "ushirosugata.jpg", "hidari90do.jpg", "banzai.jpg"];
+    const preloadedImages = [];
+    animImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+        preloadedImages.push(img);
+    });
+
+    fetch('3mon.json?cache=' + new Date().getTime())
+        .then(response => {
+            if (!response.ok) throw new Error('3mon.json が読み込めない');
+            return response.json();
+        })
+        .then(data => {
+            const uniqueQuestions = [];
+            const seen = new Set();
+            data.forEach(q => {
+                if (!seen.has(q.question)) {
+                    seen.add(q.question);
+                    uniqueQuestions.push(q);
+                }
+            });
+            allQuestions = uniqueQuestions;
+            
+            const categories = [...new Set(allQuestions.map(q => q.category || "一般"))];
+            const select = document.getElementById('category-select');
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+    function showView(id) {
+        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        const target = document.getElementById(id);
+        if (target) target.classList.remove('hidden');
+    }
+
+    function startQuiz() {
+        const selectedCategory = document.getElementById('category-select').value;
+        let pool = allQuestions;
+        
+        if (selectedCategory !== 'all') {
+            pool = allQuestions.filter(q => (q.category || "一般") === selectedCategory);
+        }
+        
+        // 常に最大3問出題する。プールが3問未満の場合はその最大数を出題。
+        const num = Math.min(pool.length, 3);
+        
+        if (num === 0) {
+            alert("該当する問題が存在しない");
+            return;
+        }
+        
+        let shuffledPool = [...pool];
+        for (let i = shuffledPool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledPool[i], shuffledPool[j]] = [shuffledPool[j], shuffledPool[i]];
+        }
+        targetQuestions = shuffledPool.slice(0, num);
+        currentIndex = 0;
+        score = 0;
+        
+        showView('view-quiz');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = targetQuestions[currentIndex];
+        document.getElementById('quiz-header').textContent = `問題 ${currentIndex + 1} / 全 ${targetQuestions.length} 問`;
+        document.getElementById('category-tag').textContent = q.category || "一般";
+        document.getElementById('question-text').textContent = q.question;
+        document.getElementById('feedback').textContent = "";
+        document.getElementById('explanation-box').classList.add('hidden');
+        document.getElementById('btn-explanation').classList.add('hidden');
+        document.getElementById('btn-next').classList.add('hidden');
+        document.querySelectorAll('.ox-container button').forEach(b => b.disabled = false);
+    }
+
+    function judge(choice) {
+        const q = targetQuestions[currentIndex];
+        const feedback = document.getElementById('feedback');
+        document.querySelectorAll('.ox-container button').forEach(b => b.disabled = true);
+        const cleanAnswer = q.answer.trim().replace(/[◯○]/g, '〇'); 
+        const cleanChoice = choice.trim().replace(/[◯○]/g, '〇');
+        
+        if(cleanChoice === cleanAnswer) {
+            feedback.textContent = "正解！";
+            feedback.style.color = "var(--accent-color)";
+            score++;
+        } else {
+            feedback.textContent = "不正解...";
+            feedback.style.color = "var(--error-color)";
+        }
+        document.getElementById('btn-explanation').classList.remove('hidden');
+        document.getElementById('btn-next').classList.remove('hidden');
+    }
+
+    function toggleExplanation() {
+        const box = document.getElementById('explanation-box');
+        const rawExp = targetQuestions[currentIndex].explanation || "";
+        box.textContent = rawExp.replace(/・/g, "");
+        box.classList.toggle('hidden');
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        if(currentIndex < targetQuestions.length) showQuestion();
+        else showResult();
+    }
+
+    function showResult() {
+        showView('view-result');
+        const percent = Math.round((score / targetQuestions.length) * 100);
+        document.getElementById('score-display').innerHTML = 
+            `正答率: <span style="color:var(--accent-color); font-weight:bold;">${percent}%</span><br>` +
+            `<span style="font-size:1.2rem;">${targetQuestions.length}問中 ${score}問 正解でした！</span>`;
+
+        const animContainer = document.getElementById('char-animation-container');
+        const sprite = document.getElementById('char-sprite');
+        const bubble = document.getElementById('speech-bubble');
+
+        animContainer.style.display = "none";
+        bubble.style.opacity = "0";
+        sprite.src = "syoumen.jpg";
+
+        if (percent >= 80) {
+            animContainer.style.display = "flex";
+            let frame = 0;
+            const interval = setInterval(() => {
+                sprite.src = animImages[frame % animImages.length];
+                frame++;
+                if (frame >= 10) {
+                    clearInterval(interval);
+                    sprite.src = "banzai.jpg";
+                    bubble.style.opacity = "1";
+                }
+            }, 150);
+        }
+    }
+</script>
+
+</body>
+</html>
